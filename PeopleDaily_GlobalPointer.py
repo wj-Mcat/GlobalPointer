@@ -2,6 +2,7 @@
 # 用GlobalPointer做中文命名实体识别
 # 数据集 http://s3.bmio.net/kashgari/china-people-daily-ner-corpus.tar.gz
 
+import os
 import numpy as np
 from bert4keras.backend import keras, K
 from bert4keras.backend import multilabel_categorical_crossentropy
@@ -20,10 +21,13 @@ batch_size = 16
 learning_rate = 2e-5
 categories = set()
 
+
 # bert配置
-config_path = '/root/kg/bert/chinese_L-12_H-768_A-12/bert_config.json'
-checkpoint_path = '/root/kg/bert/chinese_L-12_H-768_A-12/bert_model.ckpt'
-dict_path = '/root/kg/bert/chinese_L-12_H-768_A-12/vocab.txt'
+root_dir = './'
+
+config_path = root_dir + 'bert_config.json'
+checkpoint_path =root_dir + 'bert_model.ckpt'
+dict_path =root_dir + 'vocab.txt'
 
 
 def load_data(filename):
@@ -51,9 +55,11 @@ def load_data(filename):
 
 
 # 标注数据
-train_data = load_data('/root/ner/china-people-daily-ner-corpus/example.train')
-valid_data = load_data('/root/ner/china-people-daily-ner-corpus/example.dev')
-test_data = load_data('/root/ner/china-people-daily-ner-corpus/example.test')
+data_dir = './data/china-people-daily-ner-corpus'
+train_data = load_data(os.path.join(data_dir, 'example.train'))
+valid_data = load_data(os.path.join(data_dir, 'example.dev'))
+test_data = load_data(os.path.join(data_dir, 'example.test'))
+
 categories = list(sorted(categories))
 
 # 建立分词器
@@ -120,7 +126,7 @@ model.compile(
 
 
 class NamedEntityRecognizer(object):
-    """命名实体识别器
+    """命名实体识别
     """
     def recognize(self, text, threshold=0):
         tokens = tokenizer.tokenize(text, maxlen=512)
